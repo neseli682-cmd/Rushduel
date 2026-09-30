@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#101418">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link rel="manifest" href="manifest.json">
+
+<title>GOALRUSH</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #101418;
+    color: white;
+    min-height: 100vh;
+}
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 17px;
+    font-weight: bold;
+    background: #1f2930;
+    color: white;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.primary {
+    background: #00c853;
+    color: #07120b;
+}
+
+.danger {
+    background: #d32f2f;
+}
+
+.orange {
+    background: #ff9800;
+    color: #171000;
+}
+
+.blue {
+    background: #1976d2;
+}
+
+.gray {
+    background: #37474f;
+}
+
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding: 18px;
+    padding-bottom: 30px;
+}
+
+.screen.active {
+    display: block;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.logo {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    color: #9aa7af;
+    margin-top: 5px;
+}
+
+.card {
+    background: #171d22;
+    border: 1px solid #263038;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.card h2,
+.card h3 {
+    margin-top: 0;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #37474f;
+    background: #0d1114;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th,
+td {
+    padding: 10px 7px;
+    text-align: center;
+    border-bottom: 1px solid #263038;
+}
+
+th {
+    color: #8fa0aa;
+    font-size: 12px;
+}
+
+td:first-child,
+th:first-child {
+    text-align: left;
+}
+
+.player-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1b2228;
+    padding: 13px;
+    margin: 8px 0;
+    border-radius: 13px;
+}
+
+.player-row input {
+    width: 20px;
+    height: 20px;
+    accent-color: #00c853;
+}
+
+.player-name {
+    font-weight: bold;
+    flex: 1;
+}
+
+.match-card {
+    text-align: center;
+}
+
+.match-time {
+    font-size: 46px;
+    font-weight: 900;
+    margin: 10px 0;
+}
+
+.score {
+    font-size: 70px;
+    font-weight: 900;
+    margin: 10px 0;
+}
+
+.versus {
+    color: #7d8b94;
+    font-size: 18px;
+}
+
+.match-player {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.goal-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.probability {
+    text-align: center;
+    background: #11171b;
+    border-radius: 15px;
+    padding: 14px;
+    margin: 12px 0;
+}
+
+.prob-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.big-result {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    margin: 20px 0;
+}
+
+.back {
+    background: #263238;
+}
+
+.list-item {
+    background: #1a2126;
+    padding: 13px;
+    border-radius: 13px;
+    margin-bottom: 8px;
+}
+
+.rank-number {
+    display: inline-block;
+    width: 30px;
+    font-weight: 900;
+    color: #00c853;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.stat-box {
+    background: #1a2126;
+    padding: 15px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.stat-label {
+    color: #89969e;
+    font-size: 13px;
+}
+
+.trophy-player {
+    background: #1a2126;
+    padding: 15px;
+    border-radius: 14px;
+    margin: 8px 0;
+    font-weight: bold;
+}
+
+.trophy {
+    background: #242b30;
+    border-radius: 14px;
+    padding: 15px;
+    margin: 8px 0;
+}
+
+.small {
+    font-size: 13px;
+    color: #89969e;
+}
+
+.center {
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.notice {
+    padding: 13px;
+    border-radius: 12px;
+    background: #263238;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.round-info {
+    text-align: center;
+    color: #9aa7af;
+    margin: 10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TABELA -->
+<section id="tableScreen" class="screen active">
+
+    <div class="header">
+        <div class="logo">⚽ GOALRUSH</div>
+        <div class="subtitle" id="leagueTitle">GOALRUSH</div>
+    </div>
+
+    <div class="card">
+        <button class="primary" onclick="newTable()">➕ NOWA TABELA</button>
+        <button onclick="showScreen('playersScreen')">⚽ NOWY MECZ</button>
+    </div>
+
+    <div class="card">
+        <h2>🏆 TABELA</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ZAWODNIK</th>
+                        <th>M</th>
+                        <th>W</th>
+                        <th>R</th>
+                        <th>P</th>
+                        <th>GZ</th>
+                        <th>GS</th>
+                        <th>+/-</th>
+                        <th>PKT</th>
+                        <th>WR</th>
+                    </tr>
+                </thead>
+
+                <tbody id="leagueTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <button onclick="showScreen('statsScreen')">📊 STATYSTYKI</button>
+    <button onclick="showScreen('historyScreen')">📜 HISTORIA</button>
+    <button onclick="showScreen('leaderboardsScreen')">🏅 RANKINGI</button>
+    <button onclick="showScreen('recordsScreen')">🔥 REKORDY</button>
+    <button onclick="showScreen('trophiesScreen')">🏆 TROFEA</button>
+
+</section>
+
+
+<!-- WYBÓR GRACZY -->
+<section id="playersScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">⚽ GOALRUSH</div>
+        <div class="subtitle">WYBIERZ ZAWODNIKÓW</div>
+    </div>
+
+    <div class="card">
+        <h2>👥 ZAWODNICY</h2>
+
+        <div id="playersList"></div>
+
+        <div class="notice">
+            Wybierz minimum 3 zawodników.
+        </div>
+
+        <button class="primary" onclick="drawPair()">🎲 LOSUJ PARĘ</button>
+        <button class="back" onclick="showScreen('tableScreen')">↩️ WRÓĆ DO TABELI</button>
+    </div>
+
+</section>
+
+
+<!-- LOSOWANIE -->
+<section id="drawScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">🎲 LOSOWANIE</div>
+        <div class="subtitle">GOALRUSH</div>
+    </div>
+
+    <div class="card center">
+        <h2>WYLOSOWANA PARA</h2>
+
+        <div id="drawResult" class="big-result"></div>
+
+        <div id="roundInfo" class="round-info"></div>
+
+        <button class="primary" onclick="goToMatch()">⚽ PRZEJDŹ DO MECZU</button>
+        <button class="back" onclick="showScreen('playersScreen')">↩️ WRÓĆ</button>
+    </div>
+
+</section>
+
+
+<!-- MECZ -->
+<section id="matchScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">⚽ MECZ</div>
+        <div class="subtitle">1V1 • 10 MINUT</div>
+    </div>
+
+    <div class="card match-card">
+
+        <div id="probabilityBox" class="probability">
+            <h3>📊 PRAWDOPODOBIEŃSTWO</h3>
+
+            <div class="prob-row">
+                <span id="probP1Name">---</span>
+                <strong id="probP1">0%</strong>
+            </div>
+
+            <div class="prob-row">
+                <span>REMIS</span>
+                <strong id="probDraw">0%</strong>
+            </div>
+
+            <div class="prob-row">
+                <span id="probP2Name">---</span>
+                <strong id="probP2">0%</strong>
+            </div>
+        </div>
+
+        <div id="matchTime" class="match-time">10:00</div>
+
+        <div id="matchPlayer1" class="match-player">---</div>
+
+        <div id="matchScore" class="score">0 : 0</div>
+
+        <div id="matchPlayer2" class="match-player">---</div>
+
+        <div class="goal-buttons">
+            <button class="primary" onclick="addGoal(1)">⚽ GOL 1</button>
+            <button class="primary" onclick="addGoal(2)">⚽ GOL 2</button>
+        </div>
+
+        <button onclick="undoGoal()">↩️ COFNIJ GOLA</button>
+
+        <button id="startButton" class="orange" onclick="startMatch()">
+            ▶️ START
+        </button>
+
+        <button id="pauseButton" class="blue hidden" onclick="pauseMatch()">
+            ⏸️ PAUZA
+        </button>
+
+        <button id="resumeButton" class="primary hidden" onclick="resumeMatch()">
+            ▶️ WZNÓW
+        </button>
+
+        <button class="danger" onclick="endMatch()">
+            🏁 ZAKOŃCZ MECZ
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- WYNIK -->
+<section id="resultScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">🏁 KONIEC</div>
+        <div class="subtitle">WYNIK MECZU</div>
+    </div>
+
+    <div class="card center">
+        <div id="finalResult" class="big-result"></div>
+
+        <div id="finalDetails"></div>
+
+        <button class="primary" onclick="showScreen('playersScreen')">
+            ⚽ NASTĘPNY MECZ
+        </button>
+
+        <button class="back" onclick="showScreen('tableScreen')">
+            ↩️ WRÓĆ DO TABELI
+        </button>
+    </div>
+
+</section>
+
+
+<!-- STATYSTYKI -->
+<section id="statsScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">📊 STATYSTYKI</div>
+        <div class="subtitle">GOALRUSH</div>
+    </div>
+
+    <div id="statsContent"></div>
+
+    <button class="danger" onclick="clearStats()">🗑️ WYCZYŚĆ STATYSTYKI</button>
+    <button class="back" onclick="showScreen('tableScreen')">↩️ WRÓĆ DO TABELI</button>
+
+</section>
+
+
+<!-- HISTORIA -->
+<section id="historyScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">📜 HISTORIA</div>
+        <div class="subtitle">ROZEGRANE MECZE</div>
+    </div>
+
+    <div id="historyContent"></div>
+
+    <button class="danger" onclick="clearHistory()">🗑️ WYCZYŚĆ HISTORIĘ</button>
+    <button class="back" onclick="showScreen('tableScreen')">↩️ WRÓĆ DO TABELI</button>
+
+</section>
+
+
+<!-- RANKINGI -->
+<section id="leaderboardsScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">🏅 RANKINGI</div>
+        <div class="subtitle">GOALRUSH</div>
+    </div>
+
+    <div id="leaderboardsContent"></div>
+
+    <button class="back" onclick="showScreen('tableScreen')">↩️ WRÓĆ DO TABELI</button>
+
+</section>
+
+
+<!-- REKORDY -->
+<section id="recordsScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">🔥 REKORDY</div>
+        <div class="subtitle">GOALRUSH</div>
+    </div>
+
+    <div id="recordsContent"></div>
+
+    <button class="back" onclick="showScreen('tableScreen')">↩️ WRÓĆ DO TABELI</button>
+
+</section>
+
+
+<!-- TROFEA -->
+<section id="trophiesScreen" class="screen">
+
+    <div class="header">
+        <div class="logo">🏆 TROFEA</div>
+        <div class="subtitle">WYBIERZ ZAWODNIKA</div>
+    </div>
+
+    <div id="trophyPlayers"></div>
+
+    <div id="playerTrophies"></div>
+
+    <button class="back" onclick="showScreen('tableScreen')">↩️ WRÓĆ DO TABELI</button>
+
+</section>
+
+
+<script>
+
+const PLAYERS = [
+    "Kamil",
+    "Kuba",
+    "Michał",
+    "Marcel"
+];
+
+let league = {};
+let history = [];
+
+let selectedPlayers = [];
+
+let player1 = null;
+let player2 = null;
+
+let score1 = 0;
+let score2 = 0;
+
+let goalHistory = [];
+
+let timer = 600;
+let timerInterval = null;
+
+let matchRunning = false;
+let matchFinished = false;
+
+let usedPairs = [];
+
+let lastResult = null;
+
+
+/* =========================
+   LOCAL STORAGE
+========================= */
+
+function saveData() {
+    localStorage.setItem("goalrushLeague", JSON.stringify(league));
+    localStorage.setItem("goalrushHistory", JSON.stringify(history));
+}
+
+function loadData() {
+
+    const savedLeague = localStorage.getItem("goalrushLeague");
+    const savedHistory = localStorage.getItem("goalrushHistory");
+
+    if (savedLeague) {
+        league = JSON.parse(savedLeague);
+    } else {
+        createLeague();
+    }
+
+    if (savedHistory) {
+        history = JSON.parse(savedHistory);
+    }
+}
+
+
+/* =========================
+   LIGA
+========================= */
+
+function createLeague() {
+
+    league = {};
+
+    PLAYERS.forEach(player => {
+
+        league[player] = {
+            matches: 0,
+            wins: 0,
+            draws: 0,
+            losses: 0,
+            goalsFor: 0,
+            goalsAgainst: 0,
+            points: 0,
+            currentStreak: 0,
+            bestStreak: 0
+        };
+
+    });
+
+    saveData();
+    renderTable();
+}
+
+
+function newTable() {
+
+    const name = prompt("Podaj nazwę nowej tabeli:");
+
+    if (!name) return;
+
+    if (!confirm(
+        "Utworzyć nową tabelę \"" +
+        name +
+        "\"?\n\nObecna tabela i historia zostaną wyczyszczone."
+    )) {
+        return;
+    }
+
+    localStorage.setItem("goalrushLeagueName", name);
+
+    history = [];
+    usedPairs = [];
+
+    createLeague();
+
+    alert("Utworzono nową tabelę: " + name);
+
+    renderTable();
+}
+
+
+function sortPlayers() {
+
+    return PLAYERS.slice().sort((a, b) => {
+
+        const A = league[a];
+        const B = league[b];
+
+        const diffA = A.goalsFor - A.goalsAgainst;
+        const diffB = B.goalsFor - B.goalsAgainst;
+
+        if (B.points !== A.points) {
+            return B.points - A.points;
+        }
+
+        if (diffB !== diffA) {
+            return diffB - diffA;
+        }
+
+        if (B.goalsFor !== A.goalsFor) {
+            return B.goalsFor - A.goalsFor;
+        }
+
+        return B.wins - A.wins;
+    });
+}
+
+
+function renderTable() {
+
+    const tbody = document.getElementById("leagueTable");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    const sorted = sortPlayers();
+
+    sorted.forEach((player, index) => {
+
+        const p = league[player];
+
+        const diff = p.goalsFor - p.goalsAgainst;
+
+        const winrate = p.matches
+            ? Math.round((p.wins / p.matches) * 100)
+            : 0;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>
+                <strong>${index + 1}. ${player}</strong>
+            </td>
+
+            <td>${p.matches}</td>
+            <td>${p.wins}</td>
+            <td>${p.draws}</td>
+            <td>${p.losses}</td>
+            <td>${p.goalsFor}</td>
+            <td>${p.goalsAgainst}</td>
+            <td>${diff >= 0 ? "+" : ""}${diff}</td>
+            <td><strong>${p.points}</strong></td>
+            <td>${winrate}%</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    const leagueName =
+        localStorage.getItem("goalrushLeagueName") || "GOALRUSH";
+
+    document.getElementById("leagueTitle").textContent = leagueName;
+}
+
+
+/* =========================
+   PLAYER SELECTION
+========================= */
+
+function renderPlayers() {
+
+    const container = document.getElementById("playersList");
+
+    container.innerHTML = "";
+
+    PLAYERS.forEach(player => {
+
+        const checked = selectedPlayers.includes(player)
+            ? "checked"
+            : "";
+
+        const div = document.createElement("div");
+
+        div.className = "player-row";
+
+        div.innerHTML = `
+            <input
+                type="checkbox"
+                ${checked}
+                onchange="togglePlayer('${player}')"
+            >
+
+            <div class="player-name">${player}</div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+function togglePlayer(player) {
+
+    if (selectedPlayers.includes(player)) {
+
+        selectedPlayers =
+            selectedPlayers.filter(p => p !== player);
+
+    } else {
+
+        selectedPlayers.push(player);
+    }
+}
+
+
+/* =========================
+   PARĘ
+========================= */
+
+function pairKey(a, b) {
+
+    return [a, b]
+        .sort()
+        .join("|");
+}
+
+
+function getAllPairs(players) {
+
+    const pairs = [];
+
+    for (let i = 0; i < players.length; i++) {
+
+        for (let j = i + 1; j < players.length; j++) {
+
+            pairs.push(
+                pairKey(players[i], players[j])
+            );
+        }
+    }
+
+    return pairs;
+}
+
+
+function drawPair() {
+
+    if (selectedPlayers.length < 3) {
+
+        alert("Wybierz minimum 3 zawodników.");
+
+        return;
+    }
+
+    const allPairs = getAllPairs(selectedPlayers);
+
+    let availablePairs =
+        allPairs.filter(pair => !usedPairs.includes(pair));
+
+    if (availablePairs.length === 0) {
+
+        usedPairs = [];
+
+        availablePairs = allPairs;
+
+        alert(
+            "Wszystkie możliwe pary zostały już rozegrane.\n\n" +
+            "Rozpoczyna się nowa runda losowania."
+        );
+    }
+
+    const randomPair =
+        availablePairs[
+            Math.floor(Math.random() * availablePairs.length)
+        ];
+
+    usedPairs.push(randomPair);
+
+    const names = randomPair.split("|");
+
+    player1 = names[0];
+    player2 = names[1];
+
+    document.getElementById("drawResult").innerHTML =
+        `${player1}<br><span class="versus">VS</span><br>${player2}`;
+
+    const totalPairs = allPairs.length;
+
+    document.getElementById("roundInfo").textContent =
+        `Wykorzystane pary: ${usedPairs.length}/${totalPairs}`;
+
+    showScreen("drawScreen");
+}
+
+
+function goToMatch() {
+
+    setupMatch();
+
+    showScreen("matchScreen");
+
+    showProbability();
+}
+
+
+/* =========================
+   MECZ
+========================= */
+
+function setupMatch() {
+
+    score1 = 0;
+    score2 = 0;
+
+    goalHistory = [];
+
+    timer = 600;
+
+    matchRunning = false;
+    matchFinished = false;
+
+    clearInterval(timerInterval);
+
+    document.getElementById("matchPlayer1").textContent = player1;
+    document.getElementById("matchPlayer2").textContent = player2;
+
+    updateScore();
+    updateTimer();
+
+    document.getElementById("startButton")
+        .classList.remove("hidden");
+
+    document.getElementById("pauseButton")
+        .classList.add("hidden");
+
+    document.getElementById("resumeButton")
+        .classList.add("hidden");
+
+    document.getElementById("probabilityBox")
+        .classList.remove("hidden");
+}
+
+
+function startMatch() {
+
+    if (matchRunning) return;
+
+    matchRunning = true;
+
+    document.getElementById("startButton")
+        .classList.add("hidden");
+
+    document.getElementById("pauseButton")
+        .classList.remove("hidden");
+
+    document.getElementById("resumeButton")
+        .classList.add("hidden");
+
+    setTimeout(() => {
+
+        document.getElementById("probabilityBox")
+            .classList.add("hidden");
+
+        runTimer();
+
+    }, 3000);
+}
+
+
+function runTimer() {
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+
+        if (!matchRunning) return;
+
+        timer--;
+
+        updateTimer();
+
+        if (timer <= 0) {
+
+            clearInterval(timerInterval);
+
+            matchRunning = false;
+
+            endMatch();
+        }
+
+    }, 1000);
+}
+
+
+function pauseMatch() {
+
+    if (!matchRunning) return;
+
+    matchRunning = false;
+
+    document.getElementById("pauseButton")
+        .classList.add("hidden");
+
+    document.getElementById("resumeButton")
+        .classList.remove("hidden");
+}
+
+
+function resumeMatch() {
+
+    if (matchFinished) return;
+
+    matchRunning = true;
+
+    document.getElementById("pauseButton")
+        .classList.remove("hidden");
+
+    document.getElementById("resumeButton")
+        .classList.add("hidden");
+
+    runTimer();
+}
+
+
+function updateTimer() {
+
+    const minutes =
+        Math.floor(timer / 60);
+
+    const seconds =
+        timer % 60;
+
+    document.getElementById("matchTime")
+        .textContent =
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+
+function updateScore() {
+
+    document.getElementById("matchScore")
+        .textContent =
+        `${score1} : ${score2}`;
+}
+
+
+function addGoal(playerNumber) {
+
+    if (matchFinished) return;
+
+    if (!matchRunning) {
+
+        alert("Najpierw kliknij START.");
+
+        return;
+    }
+
+    goalHistory.push(playerNumber);
+
+    if (playerNumber === 1) {
+        score1++;
+    } else {
+        score2++;
+    }
+
+    updateScore();
+}
+
+
+function undoGoal() {
+
+    if (goalHistory.length === 0) return;
+
+    const lastGoal =
+        goalHistory.pop();
+
+    if (lastGoal === 1) {
+        score1--;
+    } else {
+        score2--;
+    }
+
+    updateScore();
+}
+
+
+/* =========================
+   PRAWDOPODOBIEŃSTWO
+========================= */
+
+function calculateProbabilities() {
+
+    const p1 = league[player1];
+    const p2 = league[player2];
+
+    const form1 =
+        (p1.wins + 1) /
+        (p1.matches + 2);
+
+    const form2 =
+        (p2.wins + 1) /
+        (p2.matches + 2);
+
+    const totalMatches =
+        p1.matches + p2.matches;
+
+    let historicalDrawRate;
+
+    if (totalMatches === 0) {
+
+        historicalDrawRate = 0.20;
+
+    } else {
+
+        const draws =
+            p1.draws + p2.draws;
+
+        historicalDrawRate =
+            draws / Math.max(1, totalMatches);
+    }
+
+    let draw =
+        12 + historicalDrawRate * 28;
+
+    draw =
+        Math.max(10, Math.min(30, draw));
+
+    const remaining = 100 - draw;
+
+    const formTotal =
+        form1 + form2;
+
+    let prob1 =
+        remaining * (form1 / formTotal);
+
+    let prob2 =
+        remaining * (form2 / formTotal);
+
+    prob1 = Math.max(10, prob1);
+    prob2 = Math.max(10, prob2);
+
+    const total =
+        prob1 + prob2 + draw;
+
+    prob1 =
+        prob1 / total * 100;
+
+    prob2 =
+        prob2 / total * 100;
+
+    draw =
+        draw / total * 100;
+
+    return {
+        p1: Math.round(prob1),
+        draw: Math.round(draw),
+        p2: Math.round(prob2)
+    };
+}
+
+
+function showProbability() {
+
+    const probabilities =
+        calculateProbabilities();
+
+    document.getElementById("probP1Name")
+        .textContent = player1;
+
+    document.getElementById("probP2Name")
+        .textContent = player2;
+
+    document.getElementById("probP1")
+        .textContent =
+        probabilities.p1 + "%";
+
+    document.getElementById("probDraw")
+        .textContent =
+        probabilities.draw + "%";
+
+    document.getElementById("probP2")
+        .textContent =
+        probabilities.p2 + "%";
+}
+
+
+/* =========================
+   KONIEC MECZU
+========================= */
+
+function endMatch() {
+
+    if (matchFinished) return;
+
+    if (!confirm("Zakończyć mecz?")) {
+
+        if (timer > 0) {
+            matchRunning = true;
+            runTimer();
+        }
+
+        return;
+    }
+
+    clearInterval(timerInterval);
+
+    matchRunning = false;
+    matchFinished = true;
+
+    saveMatch();
+
+    showResult();
+}
+
+
+function saveMatch() {
+
+    const winner =
+        score1 > score2
+            ? player1
+            : score2 > score1
+                ? player2
+                : null;
+
+    const loser =
+        score1 > score2
+            ? player2
+            : score2 > score1
+                ? player1
+                : null;
+
+    const isDraw =
+        score1 === score2;
+
+    const p1 = league[player1];
+    const p2 = league[player2];
+
+    p1.matches++;
+    p2.matches++;
+
+    p1.goalsFor += score1;
+    p1.goalsAgainst += score2;
+
+    p2.goalsFor += score2;
+    p2.goalsAgainst += score1;
+
+    if (isDraw) {
+
+        p1.draws++;
+        p2.draws++;
+
+        p1.points++;
+        p2.points++;
+
+        p1.currentStreak = 0;
+        p2.currentStreak = 0;
+
+    } else {
+
+        league[winner].wins++;
+        league[winner].points += 3;
+
+        league[loser].losses++;
+
+        league[winner].currentStreak++;
+
+        league[loser].currentStreak = 0;
+
+        if (
+            league[winner].currentStreak >
+            league[winner].bestStreak
+        ) {
+
+            league[winner].bestStreak =
+                league[winner].currentStreak;
+        }
+    }
+
+    const match = {
+
+        player1,
+        player2,
+
+        score1,
+        score2,
+
+        winner,
+
+        timestamp: Date.now()
+    };
+
+    history.push(match);
+
+    lastResult = match;
+
+    saveData();
+    renderTable();
+}
+
+
+function showResult() {
+
+    const result =
+        document.getElementById("finalResult");
+
+    result.innerHTML =
+        `${player1} ${score1} : ${score2} ${player2}`;
+
+    let text = "";
+
+    if (score1 > score2) {
+
+        text =
+            `🏆 Wygrywa <strong>${player1}</strong>`;
+
+    } else if (score2 > score1) {
+
+        text =
+            `🏆 Wygrywa <strong>${player2}</strong>`;
+
+    } else {
+
+        text =
+            `🤝 <strong>REMIS</strong>`;
+    }
+
+    document.getElementById("finalDetails")
+        .innerHTML = `
+            <div class="card">
+                ${text}
+                <br><br>
+                ⚽ Gole: ${score1 + score2}
+                <br>
+                📊 Różnica: ${Math.abs(score1 - score2)}
+            </div>
+        `;
+
+    showScreen("resultScreen");
+}
+
+
+/* =========================
+   STATYSTYKI
+========================= */
+
+function renderStats() {
+
+    const container =
+        document.getElementById("statsContent");
+
+    container.innerHTML = "";
+
+    PLAYERS.forEach(player => {
+
+        const p = league[player];
+
+        const winrate =
+            p.matches
+                ? Math.round(
+                    p.wins / p.matches * 100
+                )
+                : 0;
+
+        container.innerHTML += `
+
+            <div class="card">
+
+                <h2>${player}</h2>
+
+                <div class="stat-grid">
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.matches}
+                        </div>
+                        <div class="stat-label">
+                            MECZE
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.wins}
+                        </div>
+                        <div class="stat-label">
+                            WYGRANE
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.draws}
+                        </div>
+                        <div class="stat-label">
+                            REMISY
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.losses}
+                        </div>
+                        <div class="stat-label">
+                            PORAŻKI
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${winrate}%
+                        </div>
+                        <div class="stat-label">
+                            WINRATE
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.goalsFor}
+                        </div>
+                        <div class="stat-label">
+                            GOLE
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.currentStreak}
+                        </div>
+                        <div class="stat-label">
+                            AKTUALNA SERIA
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-number">
+                            ${p.bestStreak}
+                        </div>
+                        <div class="stat-label">
+                            NAJLEPSZA SERIA
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+    });
+}
+
+
+/* =========================
+   HISTORIA
+========================= */
+
+function renderHistory() {
+
+    const container =
+        document.getElementById("historyContent");
+
+    container.innerHTML = "";
+
+    if (history.length === 0) {
+
+        container.innerHTML = `
+            <div class="card center">
+                Brak rozegranych meczów.
+            </div>
+        `;
+
+        return;
+    }
+
+    history
+        .slice()
+        .reverse()
+        .forEach((match, index) => {
+
+            const date =
+                new Date(match.timestamp);
+
+            const dateText =
+                date.toLocaleString("pl-PL");
+
+            let winnerText;
+
+            if (match.score1 > match.score2) {
+
+                winnerText =
+                    `🏆 ${match.player1}`;
+
+            } else if (match.score2 > match.score1) {
+
+                winnerText =
+                    `🏆 ${match.player2}`;
+
+            } else {
+
+                winnerText =
+                    `🤝 REMIS`;
+            }
+
+            container.innerHTML += `
+
+                <div class="list-item">
+
+                    <strong>
+                        ${match.player1}
+                        ${match.score1}
+                        :
+                        ${match.score2}
+                        ${match.player2}
+                    </strong>
+
+                    <br>
+
+                    <span class="small">
+                        ${winnerText}
+                        <br>
+                        ${dateText}
+                    </span>
+
+                </div>
+            `;
+        });
+}
+
+
+function clearHistory() {
+
+    if (!confirm(
+        "Na pewno wyczyścić całą historię?"
+    )) {
+        return;
+    }
+
+    history = [];
+    usedPairs = [];
+
+    saveData();
+
+    renderHistory();
+}
+
+
+/* =========================
+   RANKINGI
+========================= */
+
+function rankingBy(value) {
+
+    return PLAYERS
+        .slice()
+        .sort((a, b) =>
+            league[b][value] -
+            league[a][value]
+        );
+}
+
+
+function renderLeaderboards() {
+
+    const container =
+        document.getElementById("leaderboardsContent");
+
+    container.innerHTML = "";
+
+    const rankings = [
+
+        {
+            title: "⚽ NAJWIĘCEJ GOLI",
+            value: "goalsFor"
+        },
+
+        {
+            title: "🏆 NAJWIĘCEJ WYGRANYCH",
+            value: "wins"
+        },
+
+        {
+            title: "❌ NAJWIĘCEJ PORAŻEK",
+            value: "losses"
+        },
+
+        {
+            title: "🔥 NAJLEPSZA SERIA",
+            value: "bestStreak"
+        }
+
+    ];
+
+    rankings.forEach(ranking => {
+
+        const sorted =
+            rankingBy(ranking.value);
+
+        let html = `
+            <div class="card">
+                <h2>${ranking.title}</h2>
+        `;
+
+        sorted.forEach((player, index) => {
+
+            html += `
+                <div class="list-item">
+                    <span class="rank-number">
+                        ${index + 1}.
+                    </span>
+
+                    ${player}
+
+                    <strong style="float:right">
+                        ${league[player][ranking.value]}
+                    </strong>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+
+        container.innerHTML += html;
+    });
+}
+
+
+/* =========================
+   REKORDY
+========================= */
+
+function renderRecords() {
+
+    const container =
+        document.getElementById("recordsContent");
+
+    container.innerHTML = "";
+
+    if (history.length === 0) {
+
+        container.innerHTML = `
+            <div class="card center">
+                Brak rekordów — rozegraj pierwszy mecz.
+            </div>
+        `;
+
+        return;
+    }
+
+    let mostGoalsMatch = null;
+    let biggestMargin = null;
+
+    history.forEach(match => {
+
+        const totalGoals =
+            match.score1 + match.score2;
+
+        const margin =
+            Math.abs(
+                match.score1 - match.score2
+            );
+
+        if (
+            !mostGoalsMatch ||
+            totalGoals >
+            mostGoalsMatch.score1 +
+            mostGoalsMatch.score2
+        ) {
+
+            mostGoalsMatch = match;
+        }
+
+        if (
+            !biggestMargin ||
+            margin >
+            Math.abs(
+                biggestMargin.score1 -
+                biggestMargin.score2
+            )
+        ) {
+
+            biggestMargin = match;
+        }
+    });
+
+    let mostWinsPlayer =
+        PLAYERS
+            .slice()
+            .sort(
+                (a, b) =>
+                    league[b].wins -
+                    league[a].wins
+            )[0];
+
+    let mostMatchesPlayer =
+        PLAYERS
+            .slice()
+            .sort(
+                (a, b) =>
+                    league[b].matches -
+                    league[a].matches
+            )[0];
+
+    let mostDrawsPlayer =
+        PLAYERS
+            .slice()
+            .sort(
+                (a, b) =>
+                    league[b].draws -
+                    league[a].draws
+            )[0];
+
+    let mostGoalsPlayer =
+        PLAYERS
+            .slice()
+            .sort(
+                (a, b) =>
+                    league[b].goalsFor -
+                    league[a].goalsFor
+            )[0];
+
+    let longestStreakPlayer =
+        PLAYERS
+            .slice()
+            .sort(
+                (a, b) =>
+                    league[b].bestStreak -
+                    league[a].bestStreak
+            )[0];
+
+
+    container.innerHTML = `
+
+        <div class="card">
+
+            <h2>⚽ NAJWIĘCEJ GOLI W MECZU</h2>
+
+            <div class="big-result">
+                ${mostGoalsMatch.player1}
+                ${mostGoalsMatch.score1}
+                :
+                ${mostGoalsMatch.score2}
+                ${mostGoalsMatch.player2}
+            </div>
+
+            <div class="center">
+                Razem:
+                ${mostGoalsMatch.score1 +
+                  mostGoalsMatch.score2}
+                goli
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>💥 NAJWIĘKSZA RÓŻNICA</h2>
+
+            <div class="big-result">
+                ${biggestMargin.player1}
+                ${biggestMargin.score1}
+                :
+                ${biggestMargin.score2}
+                ${biggestMargin.player2}
+            </div>
+
+            <div class="center">
+                Różnica:
+                ${Math.abs(
+                    biggestMargin.score1 -
+                    biggestMargin.score2
+                )}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+            <h2>🔥 NAJDŁUŻSZA SERIA</h2>
+
+            <strong>
+                ${longestStreakPlayer}
+            </strong>
+
+            <br>
+
+            ${league[longestStreakPlayer].bestStreak}
+            wygranych z rzędu
+        </div>
+
+
+        <div class="card">
+            <h2>🏆 NAJWIĘCEJ WYGRANYCH</h2>
+
+            <strong>
+                ${mostWinsPlayer}
+            </strong>
+
+            <br>
+
+            ${league[mostWinsPlayer].wins}
+            wygranych
+        </div>
+
+
+        <div class="card">
+            <h2>🎮 NAJWIĘCEJ MECZÓW</h2>
+
+            <strong>
+                ${mostMatchesPlayer}
+            </strong>
+
+            <br>
+
+            ${league[mostMatchesPlayer].matches}
+            meczów
+        </div>
+
+
+        <div class="card">
+            <h2>🤝 NAJWIĘCEJ REMISÓW</h2>
+
+            <strong>
+                ${mostDrawsPlayer}
+            </strong>
+
+            <br>
+
+            ${league[mostDrawsPlayer].draws}
+            remisów
+        </div>
+
+
+        <div class="card">
+            <h2>⚽ NAJWIĘCEJ GOLI ŁĄCZNIE</h2>
+
+            <strong>
+                ${mostGoalsPlayer}
+            </strong>
+
+            <br>
+
+            ${league[mostGoalsPlayer].goalsFor}
+            goli
+        </div>
+    `;
+}
+
+
+/* =========================
+   TROFEA
+========================= */
+
+function getTrophyWinners(value) {
+
+    const max =
+        Math.max(
+            ...PLAYERS.map(
+                p => league[p][value]
+            )
+        );
+
+    if (max <= 0) return [];
+
+    return PLAYERS.filter(
+        p => league[p][value] === max
+    );
+}
+
+
+function renderTrophies() {
+
+    const players =
+        document.getElementById("trophyPlayers");
+
+    players.innerHTML = `
+        <div class="card">
+            <h2>👤 ZAWODNICY</h2>
+            <p class="small">
+                Kliknij zawodnika, aby zobaczyć jego trofea.
+            </p>
+        </div>
+    `;
+
+    PLAYERS.forEach(player => {
+
+        players.innerHTML += `
+            <div
+                class="trophy-player"
+                onclick="showPlayerTrophies('${player}')"
+            >
+                🏆 ${player}
+            </div>
+        `;
+    });
+
+    document.getElementById("playerTrophies")
+        .innerHTML = "";
+}
+
+
+function showPlayerTrophies(player) {
+
+    const container =
+        document.getElementById("playerTrophies");
+
+    const trophyTypes = [
+
+        {
+            title: "⚽ Król Goli",
+            value: "goalsFor",
+            minimum: 1
+        },
+
+        {
+            title: "🏆 Mistrz Wygranych",
+            value: "wins",
+            minimum: 1
+        },
+
+        {
+            title: "❌ Najwięcej Porażek",
+            value: "losses",
+            minimum: 1
+        },
+
+        {
+            title: "🔥 Król Serii",
+            value: "bestStreak",
+            minimum: 1
+        }
+
+    ];
+
+    let html = `
+        <div class="card">
+
+            <h2>🏆 ${player}</h2>
+    `;
+
+    trophyTypes.forEach(trophy => {
+
+        const winners =
+            getTrophyWinners(
+                trophy.value
+            );
+
+        const hasTrophy =
+            winners.includes(player) &&
+            league[player][trophy.value] >=
+            trophy.minimum;
+
+        html += `
+            <div class="trophy">
+
+                ${hasTrophy ? "🏆" : "🔒"}
+
+                <strong>
+                    ${trophy.title}
+                </strong>
+
+                <br>
+
+                <span class="small">
+                    ${hasTrophy
+                        ? "ZDOBYTE"
+                        : "Jeszcze niezdobyte"}
+                </span>
+
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+
+    container.innerHTML = html;
+}
+
+
+/* =========================
+   WYCZYŚĆ STATYSTYKI
+========================= */
+
+function clearStats() {
+
+    if (!confirm(
+        "Wyczyścić wszystkie statystyki i historię?"
+    )) {
+        return;
+    }
+
+    history = [];
+    usedPairs = [];
+
+    createLeague();
+
+    renderStats();
+    renderTable();
+}
+
+
+/* =========================
+   NAWIGACJA
+========================= */
+
+function showScreen(id) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(screen => {
+
+            screen.classList.remove("active");
+        });
+
+    const screen =
+        document.getElementById(id);
+
+    if (screen) {
+        screen.classList.add("active");
+    }
+
+    window.scrollTo(0, 0);
+
+    if (id === "playersScreen") {
+        renderPlayers();
+    }
+
+    if (id === "statsScreen") {
+        renderStats();
+    }
+
+    if (id === "historyScreen") {
+        renderHistory();
+    }
+
+    if (id === "leaderboardsScreen") {
+        renderLeaderboards();
+    }
+
+    if (id === "recordsScreen") {
+        renderRecords();
+    }
+
+    if (id === "trophiesScreen") {
+        renderTrophies();
+    }
+
+    if (id === "tableScreen") {
+        renderTable();
+    }
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadData();
+
+renderTable();
+renderPlayers();
+
+showScreen("tableScreen");
+
+
+/* =========================
+   SERVICE WORKER
+========================= */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker
+            .register("./sw.js")
+            .catch(error => {
+                console.log(
+                    "Service Worker error:",
+                    error
+                );
+            });
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
