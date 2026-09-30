@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GOALRUSH</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101418;
+  color: white;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.screen.active {
+  display: block;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin: 10px 0 5px;
+  color: #00ff88;
+}
+
+.subtitle {
+  text-align: center;
+  color: #aaa;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: #1b2229;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.25);
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin: 7px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.green {
+  background: #00d977;
+  color: #06140d;
+}
+
+.yellow {
+  background: #ffd43b;
+  color: #171300;
+}
+
+.red {
+  background: #ff4d4d;
+  color: white;
+}
+
+.blue {
+  background: #4285f4;
+  color: white;
+}
+
+.gray {
+  background: #343c45;
+  color: white;
+}
+
+.back {
+  background: #252d35;
+  color: white;
+}
+
+.players {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.player-box {
+  background: #252d35;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.player-box input {
+  width: 20px;
+  height: 20px;
+}
+
+.match-players {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+}
+
+.match-player {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.vs {
+  font-size: 24px;
+  color: #00ff88;
+}
+
+.score {
+  text-align: center;
+  font-size: 75px;
+  font-weight: bold;
+  margin: 25px 0;
+}
+
+.timer {
+  text-align: center;
+  font-size: 55px;
+  font-weight: bold;
+  color: #00ff88;
+  margin: 15px 0;
+}
+
+.pause-text {
+  display: none;
+  text-align: center;
+  color: #ffd43b;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.chance-card {
+  display: none;
+  background: #222b33;
+  border: 2px solid #00ff88;
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.chances {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chance {
+  background: #171d22;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.chance strong {
+  display: block;
+  font-size: 22px;
+  color: #00ff88;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th,
+td {
+  padding: 10px 6px;
+  text-align: center;
+  border-bottom: 1px solid #343c45;
+}
+
+th {
+  color: #00ff88;
+  font-size: 13px;
+}
+
+td:first-child,
+th:first-child {
+  text-align: left;
+}
+
+.history-item {
+  background: #252d35;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.history-score {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0;
+}
+
+.result {
+  text-align: center;
+}
+
+.result-score {
+  font-size: 70px;
+  font-weight: bold;
+  color: #00ff88;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.small {
+  color: #aaa;
+  font-size: 13px;
+}
+
+@media(max-width:600px) {
+  h1 {
+    font-size: 34px;
+  }
+
+  .players {
+    grid-template-columns: 1fr;
+  }
+
+  .match-player {
+    font-size: 19px;
+  }
+
+  .score {
+    font-size: 60px;
+  }
+
+  .timer {
+    font-size: 45px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ========================= -->
+<!-- TABELA -->
+<!-- ========================= -->
+
+<div id="tableScreen" class="screen active">
+  <div class="container">
+
+    <h1>⚽ GOALRUSH</h1>
+    <div class="subtitle" id="leagueTitle">Tabela ligowa</div>
+
+    <div class="card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ZAWODNIK</th>
+              <th>M</th>
+              <th>W</th>
+              <th>R</th>
+              <th>P</th>
+              <th>GZ</th>
+              <th>GS</th>
+              <th>+/-</th>
+              <th>PKT</th>
+              <th>WR</th>
+            </tr>
+          </thead>
+
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <button class="green" onclick="goToPlayers()">
+      ⚽ NOWY MECZ
+    </button>
+
+    <button class="blue" onclick="showStats()">
+      📊 STATYSTYKI
+    </button>
+
+    <button class="gray" onclick="showHistory()">
+      📜 HISTORIA MECZÓW
+    </button>
+
+    <button class="yellow" onclick="newTable()">
+      ➕ NOWA TABELA
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- WYBÓR GRACZY -->
+<!-- ========================= -->
+
+<div id="playersScreen" class="screen">
+  <div class="container">
+
+    <h1>👥 GRACZE</h1>
+
+    <div class="card">
+      <p>Wybierz minimum 3 zawodników:</p>
+
+      <div class="players">
+
+        <label class="player-box">
+          <input type="checkbox" value="Kamil">
+          <span>Kamil</span>
+        </label>
+
+        <label class="player-box">
+          <input type="checkbox" value="Kuba">
+          <span>Kuba</span>
+        </label>
+
+        <label class="player-box">
+          <input type="checkbox" value="Michał">
+          <span>Michał</span>
+        </label>
+
+        <label class="player-box">
+          <input type="checkbox" value="Marcel">
+          <span>Marcel</span>
+        </label>
+
+      </div>
+    </div>
+
+    <button class="green" onclick="drawMatch()">
+      🎲 LOSUJ MECZ
+    </button>
+
+    <button class="back" onclick="showTable()">
+      ↩️ WRÓĆ DO TABELI
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- MECZ -->
+<!-- ========================= -->
+
+<div id="matchScreen" class="screen">
+  <div class="container">
+
+    <h1>⚽ MECZ</h1>
+
+    <div class="card">
+
+      <div class="match-players">
+        <div class="match-player" id="player1Name">
+          Kamil
+        </div>
+
+        <div class="vs">
+          VS
+        </div>
+
+        <div class="match-player" id="player2Name">
+          Kuba
+        </div>
+      </div>
+
+      <div class="score">
+        <span id="score1">0</span>
+        :
+        <span id="score2">0</span>
+      </div>
+
+      <div class="timer" id="timer">
+        10:00
+      </div>
+
+      <div id="pauseText" class="pause-text">
+        ⏸️ MECZ ZAPAUZOWANY
+      </div>
+
+    </div>
+
+
+    <!-- SZANSE -->
+
+    <div id="chanceCard" class="chance-card">
+
+      <strong>📊 SZANSE NA WYNIK</strong>
+
+      <div class="chances">
+
+        <div class="chance">
+          <span id="chance1Name">Kamil</span>
+          <strong id="chance1">50%</strong>
+        </div>
+
+        <div class="chance">
+          REMIS
+          <strong id="chanceDraw">20%</strong>
+        </div>
+
+        <div class="chance">
+          <span id="chance2Name">Kuba</span>
+          <strong id="chance2">30%</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <button id="startButton" class="green" onclick="startMatch()">
+      ▶️ START
+    </button>
+
+    <button id="resumeButton"
+            class="green"
+            onclick="resumeMatch()"
+            style="display:none">
+      ▶️ WZNÓW
+    </button>
+
+    <button id="pauseButton"
+            class="yellow"
+            onclick="pauseMatch()">
+      ⏸️ PAUZA
+    </button>
+
+
+    <div class="card">
+
+      <button class="blue" onclick="goal(1)">
+        ⚽ GOL — <span id="goalName1">Kamil</span>
+      </button>
+
+      <button class="blue" onclick="goal(2)">
+        ⚽ GOL — <span id="goalName2">Kuba</span>
+      </button>
+
+      <button class="gray" onclick="undoGoal()">
+        ↩️ COFNIJ OSTATNI GOL
+      </button>
+
+      <button class="red" onclick="finishMatch()">
+        🏁 ZAKOŃCZ MECZ
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- WYNIK -->
+<!-- ========================= -->
+
+<div id="resultScreen" class="screen">
+  <div class="container">
+
+    <h1>🏆 WYNIK</h1>
+
+    <div class="card result">
+
+      <h2 id="resultPlayer1">Kamil</h2>
+
+      <div class="result-score">
+        <span id="resultScore1">0</span>
+        :
+        <span id="resultScore2">0</span>
+      </div>
+
+      <h2 id="resultPlayer2">Kuba</h2>
+
+      <p id="resultText"></p>
+
+    </div>
+
+    <button class="green" onclick="newMatch()">
+      ⚽ NASTĘPNY MECZ
+    </button>
+
+    <button class="blue" onclick="showTable()">
+      🏆 TABELA
+    </button>
+
+    <button class="back" onclick="showTable()">
+      ↩️ WRÓĆ DO TABELI
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- STATYSTYKI -->
+<!-- ========================= -->
+
+<div id="statsScreen" class="screen">
+  <div class="container">
+
+    <h1>📊 STATYSTYKI</h1>
+
+    <div class="card" id="statsContainer"></div>
+
+    <button class="red" onclick="clearStats()">
+      🗑️ WYCZYŚĆ STATYSTYKI
+    </button>
+
+    <button class="back" onclick="showTable()">
+      ↩️ WRÓĆ DO TABELI
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- HISTORIA -->
+<!-- ========================= -->
+
+<div id="historyScreen" class="screen">
+  <div class="container">
+
+    <h1>📜 HISTORIA</h1>
+
+    <div id="historyContainer"></div>
+
+    <button class="red" onclick="clearHistory()">
+      🗑️ WYCZYŚĆ HISTORIĘ
+    </button>
+
+    <button class="back" onclick="showTable()">
+      ↩️ WRÓĆ DO TABELI
+    </button>
+
+  </div>
+</div>
+
+
+<script>
+
+/* =========================
+   PODSTAWOWE DANE
+========================= */
+
+const players = [
+  "Kamil",
+  "Kuba",
+  "Michał",
+  "Marcel"
+];
+
+let selectedPlayers = [];
+
+let player1 = "";
+let player2 = "";
+
+let score1 = 0;
+let score2 = 0;
+
+let seconds = 600;
+
+let timerInterval = null;
+let probabilityTimeout = null;
+
+let matchRunning = false;
+let matchPaused = false;
+
+let goalHistory = [];
+
+let usedPairs = [];
+
+let leagueName =
+  localStorage.getItem("goalrushLeagueName") ||
+  "GOALRUSH";
+
+
+/* =========================
+   POMOCNICZE
+========================= */
+
+function getHistory() {
+
+  try {
+
+    const saved =
+      localStorage.getItem("goalrushHistory");
+
+    if (!saved) {
+      return [];
+    }
+
+    const history = JSON.parse(saved);
+
+    if (!Array.isArray(history)) {
+      return [];
+    }
+
+    return history;
+
+  } catch (error) {
+
+    console.error(
+      "Błąd odczytu historii:",
+      error
+    );
+
+    return [];
+  }
+}
+
+
+function saveHistory(history) {
+
+  localStorage.setItem(
+    "goalrushHistory",
+    JSON.stringify(history)
+  );
+}
+
+
+/* =========================
+   EKRANY
+========================= */
+
+function showScreen(id) {
+
+  document
+    .querySelectorAll(".screen")
+    .forEach(screen => {
+      screen.classList.remove("active");
+    });
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+}
+
+
+function showTable() {
+
+  stopTimer();
+
+  clearTimeout(probabilityTimeout);
+
+  renderTable();
+
+  showScreen("tableScreen");
+}
+
+
+/* =========================
+   NOWA TABELA
+========================= */
+
+function newTable() {
+
+  const name = prompt(
+    "Podaj nazwę nowej tabeli:",
+    "GOALRUSH"
+  );
+
+  if (name === null) {
+    return;
+  }
+
+  const cleanName = name.trim();
+
+  leagueName =
+    cleanName || "GOALRUSH";
+
+  localStorage.setItem(
+    "goalrushLeagueName",
+    leagueName
+  );
+
+  /*
+     WAŻNE:
+     Nowa tabela usuwa również wszystkie
+     zapisane mecze.
+  */
+
+  localStorage.removeItem(
+    "goalrushHistory"
+  );
+
+  usedPairs = [];
+
+  goalHistory = [];
+
+  renderTable();
+
+  alert(
+    "✅ Utworzono nową tabelę!"
+  );
+
+  showTable();
+}
+
+
+/* =========================
+   TABELA
+========================= */
+
+function renderTable() {
+
+  document.getElementById(
+    "leagueTitle"
+  ).textContent =
+    leagueName;
+
+  const history = getHistory();
+
+  const stats = {};
+
+  players.forEach(player => {
+
+    stats[player] = {
+      matches: 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      goalsFor: 0,
+      goalsAgainst: 0,
+      points: 0
+    };
+
+  });
+
+
+  history.forEach(match => {
+
+    if (!stats[match.player1]) {
+      return;
+    }
+
+    if (!stats[match.player2]) {
+      return;
+    }
+
+    const s1 = stats[match.player1];
+    const s2 = stats[match.player2];
+
+    s1.matches++;
+    s2.matches++;
+
+    s1.goalsFor += match.score1;
+    s1.goalsAgainst += match.score2;
+
+    s2.goalsFor += match.score2;
+    s2.goalsAgainst += match.score1;
+
+
+    if (match.score1 > match.score2) {
+
+      s1.wins++;
+      s1.points += 3;
+
+      s2.losses++;
+
+    } else if (match.score2 > match.score1) {
+
+      s2.wins++;
+      s2.points += 3;
+
+      s1.losses++;
+
+    } else {
+
+      s1.draws++;
+      s2.draws++;
+
+      s1.points++;
+      s2.points++;
+
+    }
+
+  });
+
+
+  const rows = players.map(player => {
+
+    const s = stats[player];
+
+    const difference =
+      s.goalsFor - s.goalsAgainst;
+
+    const winrate =
+      s.matches > 0
+        ? Math.round(
+            (s.wins / s.matches) * 100
+          )
+        : 0;
+
+    return {
+      player,
+      ...s,
+      difference,
+      winrate
+    };
+
+  });
+
+
+  rows.sort((a, b) => {
+
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+
+    if (b.difference !== a.difference) {
+      return b.difference - a.difference;
+    }
+
+    if (b.goalsFor !== a.goalsFor) {
+      return b.goalsFor - a.goalsFor;
+    }
+
+    return b.wins - a.wins;
+
+  });
+
+
+  const body =
+    document.getElementById(
+      "tableBody"
+    );
+
+  body.innerHTML = "";
+
+
+  rows.forEach((row, index) => {
+
+    const tr =
+      document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td><strong>${row.player}</strong></td>
+      <td>${row.matches}</td>
+      <td>${row.wins}</td>
+      <td>${row.draws}</td>
+      <td>${row.losses}</td>
+      <td>${row.goalsFor}</td>
+      <td>${row.goalsAgainst}</td>
+      <td>${row.difference}</td>
+      <td><strong>${row.points}</strong></td>
+      <td>${row.winrate}%</td>
+    `;
+
+    body.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================
+   WYBÓR GRACZY
+========================= */
+
+function goToPlayers() {
+
+  document
+    .querySelectorAll(
+      '#playersScreen input[type="checkbox"]'
+    )
+    .forEach(input => {
+      input.checked = false;
+    });
+
+  showScreen("playersScreen");
+}
+
+
+/* =========================
+   LOSOWANIE PARY
+========================= */
+
+function makePairKey(a, b) {
+
+  return [a, b]
+    .sort()
+    .join("|");
+
+}
+
+
+function drawMatch() {
+
+  selectedPlayers =
+    Array.from(
+      document.querySelectorAll(
+        '#playersScreen input[type="checkbox"]:checked'
+      )
+    )
+    .map(input => input.value);
+
+
+  if (selectedPlayers.length < 3) {
+
+    alert(
+      "⚠️ Wybierz minimum 3 zawodników!"
+    );
+
+    return;
+  }
+
+
+  createMatch();
+}
+
+
+function createMatch() {
+
+  const possiblePairs = [];
+
+  for (
+    let i = 0;
+    i < selectedPlayers.length;
+    i++
+  ) {
+
+    for (
+      let j = i + 1;
+      j < selectedPlayers.length;
+      j++
+    ) {
+
+      const a = selectedPlayers[i];
+      const b = selectedPlayers[j];
+
+      const key =
+        makePairKey(a, b);
+
+      if (!usedPairs.includes(key)) {
+
+        possiblePairs.push({
+          a,
+          b,
+          key
+        });
+
+      }
+
+    }
+
+  }
+
+
+  /*
+     Wszystkie pary zostały wykorzystane.
+     Zaczynamy nową rundę.
+  */
+
+  if (possiblePairs.length === 0) {
+
+    usedPairs = [];
+
+    for (
+      let i = 0;
+      i < selectedPlayers.length;
+      i++
+    ) {
+
+      for (
+        let j = i + 1;
+        j < selectedPlayers.length;
+        j++
+      ) {
+
+        possiblePairs.push({
+          a: selectedPlayers[i],
+          b: selectedPlayers[j],
+          key: makePairKey(
+            selectedPlayers[i],
+            selectedPlayers[j]
+          )
+        });
+
+      }
+
+    }
+
+  }
+
+
+  const randomIndex =
+    Math.floor(
+      Math.random() *
+      possiblePairs.length
+    );
+
+  const pair =
+    possiblePairs[randomIndex];
+
+
+  player1 = pair.a;
+  player2 = pair.b;
+
+  usedPairs.push(pair.key);
+
+
+  score1 = 0;
+  score2 = 0;
+
+  seconds = 600;
+
+  goalHistory = [];
+
+  matchRunning = false;
+  matchPaused = false;
+
+  stopTimer();
+
+  clearTimeout(
+    probabilityTimeout
+  );
+
+
+  document.getElementById(
+    "player1Name"
+  ).textContent = player1;
+
+  document.getElementById(
+    "player2Name"
+  ).textContent = player2;
+
+  document.getElementById(
+    "goalName1"
+  ).textContent = player1;
+
+  document.getElementById(
+    "goalName2"
+  ).textContent = player2;
+
+
+  document.getElementById(
+    "score1"
+  ).textContent = "0";
+
+  document.getElementById(
+    "score2"
+  ).textContent = "0";
+
+
+  document.getElementById(
+    "timer"
+  ).textContent = "10:00";
+
+
+  document.getElementById(
+    "startButton"
+  ).style.display = "block";
+
+  document.getElementById(
+    "resumeButton"
+  ).style.display = "none";
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display = "block";
+
+
+  document.getElementById(
+    "pauseText"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "chanceCard"
+  ).style.display = "none";
+
+
+  showScreen("matchScreen");
+}
+
+
+/* =========================
+   STATYSTYKI GRACZA
+========================= */
+
+function getPlayerStats(player) {
+
+  const history = getHistory();
+
+  let matches = 0;
+  let wins = 0;
+  let draws = 0;
+  let losses = 0;
+
+  history.forEach(match => {
+
+    if (
+      match.player1 !== player &&
+      match.player2 !== player
+    ) {
+      return;
+    }
+
+    matches++;
+
+
+    if (
+      match.score1 ===
+      match.score2
+    ) {
+
+      draws++;
+
+      return;
+    }
+
+
+    const player1Won =
+      match.score1 > match.score2;
+
+    const won =
+      (
+        match.player1 === player &&
+        player1Won
+      ) ||
+      (
+        match.player2 === player &&
+        !player1Won
+      );
+
+
+    if (won) {
+      wins++;
+    } else {
+      losses++;
+    }
+
+  });
+
+
+  return {
+    matches,
+    wins,
+    draws,
+    losses
+  };
+
+}
+
+
+/* =========================
+   SZANSE
+========================= */
+
+function calculateWinChances() {
+
+  const s1 =
+    getPlayerStats(player1);
+
+  const s2 =
+    getPlayerStats(player2);
+
+  const totalHistorical =
+    s1.matches + s2.matches;
+
+
+  const form1 =
+    (s1.wins + 1) /
+    (s1.matches + 2);
+
+  const form2 =
+    (s2.wins + 1) /
+    (s2.matches + 2);
+
+
+  const historicalDraws =
+    s1.draws + s2.draws;
+
+
+  let drawChance;
+
+
+  if (totalHistorical === 0) {
+
+    drawChance = 20;
+
+  } else {
+
+    const drawRate =
+      historicalDraws /
+      totalHistorical;
+
+    drawChance =
+      12 +
+      drawRate * 28;
+
+    drawChance =
+      Math.max(
+        10,
+        Math.min(30, drawChance)
+      );
+
+  }
+
+
+  const remaining =
+    100 - drawChance;
+
+  const formTotal =
+    form1 + form2;
+
+
+  let chance1 =
+    remaining *
+    (form1 / formTotal);
+
+  let chance2 =
+    remaining *
+    (form2 / formTotal);
+
+
+  /*
+     Minimalna szansa 10%.
+  */
+
+  if (chance1 < 10) {
+
+    chance1 = 10;
+    chance2 =
+      100 - drawChance - chance1;
+
+  }
+
+
+  if (chance2 < 10) {
+
+    chance2 = 10;
+    chance1 =
+      100 - drawChance - chance2;
+
+  }
+
+
+  /*
+     Zaokrąglenie tak, aby zawsze było dokładnie 100%.
+  */
+
+  chance1 = Math.round(chance1);
+  drawChance = Math.round(drawChance);
+
+  chance2 =
+    100 - chance1 - drawChance;
+
+
+  document.getElementById(
+    "chance1Name"
+  ).textContent = player1;
+
+  document.getElementById(
+    "chance2Name"
+  ).textContent = player2;
+
+
+  document.getElementById(
+    "chance1"
+  ).textContent =
+    chance1 + "%";
+
+
+  document.getElementById(
+    "chanceDraw"
+  ).textContent =
+    drawChance + "%";
+
+
+  document.getElementById(
+    "chance2"
+  ).textContent =
+    chance2 + "%";
+
+}
+
+
+/* =========================
+   START MECZU
+========================= */
+
+function startMatch() {
+
+  if (matchPaused) {
+
+    resumeMatch();
+
+    return;
+  }
+
+
+  if (matchRunning) {
+    return;
+  }
+
+
+  calculateWinChances();
+
+
+  document.getElementById(
+    "chanceCard"
+  ).style.display = "block";
+
+
+  document.getElementById(
+    "startButton"
+  ).style.display = "none";
+
+
+  clearTimeout(
+    probabilityTimeout
+  );
+
+
+  probabilityTimeout =
+    setTimeout(() => {
+
+      document.getElementById(
+        "chanceCard"
+      ).style.display = "none";
+
+
+      matchRunning = true;
+      matchPaused = false;
+
+      startTimer();
+
+    }, 3000);
+
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function startTimer() {
+
+  clearInterval(
+    timerInterval
+  );
+
+
+  timerInterval =
+    setInterval(() => {
+
+      if (!matchRunning) {
+        return;
+      }
+
+
+      seconds--;
+
+      updateTimer();
+
+
+      if (seconds <= 0) {
+
+        seconds = 0;
+
+        updateTimer();
+
+        finishMatch();
+
+      }
+
+    }, 1000);
+
+}
+
+
+function updateTimer() {
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const secs =
+    seconds % 60;
+
+
+  document.getElementById(
+    "timer"
+  ).textContent =
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(secs).padStart(2, "0");
+
+}
+
+
+function stopTimer() {
+
+  clearInterval(
+    timerInterval
+  );
+
+  timerInterval = null;
+
+  matchRunning = false;
+
+}
+
+
+/* =========================
+   PAUZA
+========================= */
+
+function pauseMatch() {
+
+  clearInterval(
+    timerInterval
+  );
+
+  timerInterval = null;
+
+
+  clearTimeout(
+    probabilityTimeout
+  );
+
+  probabilityTimeout = null;
+
+
+  matchRunning = false;
+  matchPaused = true;
+
+
+  document.getElementById(
+    "chanceCard"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "pauseText"
+  ).style.display = "block";
+
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "resumeButton"
+  ).style.display = "block";
+
+}
+
+
+/* =========================
+   WZNOWIENIE
+========================= */
+
+function resumeMatch() {
+
+  if (!matchPaused) {
+    return;
+  }
+
+
+  matchPaused = false;
+  matchRunning = true;
+
+
+  document.getElementById(
+    "pauseText"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "resumeButton"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "pauseButton"
+  ).style.display = "block";
+
+
+  startTimer();
+
+}
+
+
+/* =========================
+   GOLE
+========================= */
+
+function goal(player) {
+
+  if (!matchRunning) {
+
+    alert(
+      "▶️ Mecz nie jest aktualnie uruchomiony!"
+    );
+
+    return;
+  }
+
+
+  if (player === 1) {
+
+    score1++;
+
+    goalHistory.push(1);
+
+  } else {
+
+    score2++;
+
+    goalHistory.push(2);
+
+  }
+
+
+  updateScore();
+
+}
+
+
+function updateScore() {
+
+  document.getElementById(
+    "score1"
+  ).textContent = score1;
+
+  document.getElementById(
+    "score2"
+  ).textContent = score2;
+
+}
+
+
+/* =========================
+   COFNIJ GOLA
+========================= */
+
+function undoGoal() {
+
+  if (!matchRunning) {
+
+    alert(
+      "▶️ Mecz nie jest aktualnie uruchomiony!"
+    );
+
+    return;
+  }
+
+
+  if (goalHistory.length === 0) {
+
+    alert(
+      "Nie ma żadnego gola do cofnięcia."
+    );
+
+    return;
+  }
+
+
+  const lastGoal =
+    goalHistory.pop();
+
+
+  if (lastGoal === 1) {
+
+    score1--;
+
+  } else {
+
+    score2--;
+
+  }
+
+
+  updateScore();
+
+}
+
+
+/* =========================
+   KONIEC MECZU
+========================= */
+
+function finishMatch() {
+
+  clearTimeout(
+    probabilityTimeout
+  );
+
+  probabilityTimeout = null;
+
+
+  clearInterval(
+    timerInterval
+  );
+
+  timerInterval = null;
+
+
+  matchRunning = false;
+  matchPaused = false;
+
+
+  if (!player1 || !player2) {
+    return;
+  }
+
+
+  const history = getHistory();
+
+
+  history.push({
+
+    player1: player1,
+    player2: player2,
+
+    score1: score1,
+    score2: score2,
+
+    date:
+      new Date().toLocaleString(
+        "pl-PL"
+      )
+
+  });
+
+
+  saveHistory(history);
+
+
+  document.getElementById(
+    "resultPlayer1"
+  ).textContent = player1;
+
+  document.getElementById(
+    "resultPlayer2"
+  ).textContent = player2;
+
+
+  document.getElementById(
+    "resultScore1"
+  ).textContent = score1;
+
+  document.getElementById(
+    "resultScore2"
+  ).textContent = score2;
+
+
+  let resultText = "";
+
+
+  if (score1 > score2) {
+
+    resultText =
+      "🏆 Wygrywa " +
+      player1 +
+      "!";
+
+  } else if (score2 > score1) {
+
+    resultText =
+      "🏆 Wygrywa " +
+      player2 +
+      "!";
+
+  } else {
+
+    resultText =
+      "🤝 REMIS!";
+
+  }
+
+
+  document.getElementById(
+    "resultText"
+  ).textContent =
+    resultText;
+
+
+  showScreen(
+    "resultScreen"
+  );
+
+}
+
+
+/* =========================
+   NASTĘPNY MECZ
+========================= */
+
+function newMatch() {
+
+  createMatch();
+
+}
+
+
+/* =========================
+   HISTORIA
+========================= */
+
+function showHistory() {
+
+  const history =
+    getHistory();
+
+
+  const container =
+    document.getElementById(
+      "historyContainer"
+    );
+
+
+  container.innerHTML = "";
+
+
+  if (history.length === 0) {
+
+    container.innerHTML = `
+      <div class="card">
+        📭 Brak zapisanych meczów.
+      </div>
+    `;
+
+    showScreen("historyScreen");
+
+    return;
+  }
+
+
+  [...history]
+    .reverse()
+    .forEach((match, index) => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "history-item";
+
+
+      let result = "🤝 REMIS";
+
+      if (match.score1 > match.score2) {
+
+        result =
+          "🏆 " +
+          match.player1;
+
+      } else if (
+        match.score2 > match.score1
+      ) {
+
+        result =
+          "🏆 " +
+          match.player2;
+
+      }
+
+
+      div.innerHTML = `
+
+        <div>
+          <strong>Mecz ${
+            history.length - index
+          }</strong>
+        </div>
+
+        <div class="history-score">
+          ${match.score1}
+          :
+          ${match.score2}
+        </div>
+
+        <div style="text-align:center">
+          ${match.player1}
+          —
+          ${match.player2}
+        </div>
+
+        <div
+          style="
+            text-align:center;
+            margin-top:7px;
+            color:#00ff88;
+          "
+        >
+          ${result}
+        </div>
+
+        <div
+          class="small"
+          style="text-align:center;margin-top:7px"
+        >
+          ${match.date || ""}
+        </div>
+
+      `;
+
+
+      container.appendChild(div);
+
+    });
+
+
+  showScreen(
+    "historyScreen"
+  );
+
+}
+
+
+/* =========================
+   STATYSTYKI
+========================= */
+
+function showStats() {
+
+  const container =
+    document.getElementById(
+      "statsContainer"
+    );
+
+
+  container.innerHTML = "";
+
+
+  players.forEach(player => {
+
+    const stats =
+      getPlayerStats(player);
+
+
+    const winrate =
+      stats.matches > 0
+        ? Math.round(
+            (stats.wins /
+             stats.matches) *
+            100
+          )
+        : 0;
+
+
+    const div =
+      document.createElement(
+        "div"
+      );
+
+
+    div.className =
+      "card";
+
+
+    div.innerHTML = `
+
+      <h2>
+        ⚽ ${player}
+      </h2>
+
+      <p>
+        🏟️ Mecze:
+        <strong>
+          ${stats.matches}
+        </strong>
+      </p>
+
+      <p>
+        🟢 Wygrane:
+        <strong>
+          ${stats.wins}
+        </strong>
+      </p>
+
+      <p>
+        🟡 Remisy:
+        <strong>
+          ${stats.draws}
+        </strong>
+      </p>
+
+      <p>
+        🔴 Porażki:
+        <strong>
+          ${stats.losses}
+        </strong>
+      </p>
+
+      <p>
+        📈 Winrate:
+        <strong>
+          ${winrate}%
+        </strong>
+      </p>
+
+    `;
+
+
+    container.appendChild(div);
+
+  });
+
+
+  showScreen(
+    "statsScreen"
+  );
+
+}
+
+
+/* =========================
+   WYCZYŚĆ STATYSTYKI
+========================= */
+
+function clearStats() {
+
+  const confirmed =
+    confirm(
+      "⚠️ Czy na pewno chcesz wyczyścić wszystkie statystyki i wyniki?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  /*
+     NAJWAŻNIEJSZA CZĘŚĆ:
+     usuwamy historię, z której
+     tabela i statystyki liczą dane.
+  */
+
+  localStorage.removeItem(
+    "goalrushHistory"
+  );
+
+
+  /*
+     Na wszelki wypadek zapisujemy
+     pustą tablicę.
+  */
+
+  localStorage.setItem(
+    "goalrushHistory",
+    "[]"
+  );
+
+
+  /*
+     Losowanie par zaczyna się
+     całkowicie od początku.
+  */
+
+  usedPairs = [];
+
+
+  /*
+     Czyścimy również aktualną
+     historię goli.
+  */
+
+  goalHistory = [];
+
+
+  /*
+     Odświeżamy tabelę.
+  */
+
+  renderTable();
+
+
+  /*
+     Odświeżamy statystyki.
+  */
+
+  players.forEach(() => {});
+
+
+  showStats();
+
+
+  alert(
+    "✅ Wszystkie statystyki zostały wyczyszczone!"
+  );
+
+}
+
+
+/* =========================
+   WYCZYŚĆ HISTORIĘ
+========================= */
+
+function clearHistory() {
+
+  const confirmed =
+    confirm(
+      "⚠️ Czy na pewno chcesz wyczyścić całą historię?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  localStorage.removeItem(
+    "goalrushHistory"
+  );
+
+
+  localStorage.setItem(
+    "goalrushHistory",
+    "[]"
+  );
+
+
+  renderTable();
+
+
+  showHistory();
+
+
+  alert(
+    "✅ Historia została wyczyszczona!"
+  );
+
+}
+
+
+/* =========================
+   START APLIKACJI
+========================= */
+
+renderTable();
+
+</script>
+
+</body>
+</html>
